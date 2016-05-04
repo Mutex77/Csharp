@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\bin\Debug\FibonacciToN.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\bin\Debug\FibonacciToN.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\bin\Debug\FibonacciToN.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\obj\Debug\FibonacciToN.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\obj\Debug\FibonacciToN.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FibonacciToN\FibonacciToN\obj\Debug\FibonacciToN.pdb

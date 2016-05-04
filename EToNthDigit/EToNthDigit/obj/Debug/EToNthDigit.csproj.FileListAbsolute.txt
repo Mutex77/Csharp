@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\bin\Debug\EToNthDigit.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\bin\Debug\EToNthDigit.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\bin\Debug\EToNthDigit.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\obj\Debug\EToNthDigit.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\obj\Debug\EToNthDigit.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\EToNthDigit\EToNthDigit\obj\Debug\EToNthDigit.pdb

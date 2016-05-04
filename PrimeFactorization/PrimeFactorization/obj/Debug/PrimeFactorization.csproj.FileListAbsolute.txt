@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\bin\Debug\PrimeFactorization.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\bin\Debug\PrimeFactorization.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\bin\Debug\PrimeFactorization.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\obj\Debug\PrimeFactorization.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\obj\Debug\PrimeFactorization.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\PrimeFactorization\PrimeFactorization\obj\Debug\PrimeFactorization.pdb
