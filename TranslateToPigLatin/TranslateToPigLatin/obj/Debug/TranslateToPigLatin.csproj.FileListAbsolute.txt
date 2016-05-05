@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\bin\Debug\TranslateToPigLatin.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\bin\Debug\TranslateToPigLatin.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\bin\Debug\TranslateToPigLatin.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\obj\Debug\TranslateToPigLatin.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\obj\Debug\TranslateToPigLatin.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\TranslateToPigLatin\TranslateToPigLatin\obj\Debug\TranslateToPigLatin.pdb

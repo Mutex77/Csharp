@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\bin\Debug\CountVowels.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\bin\Debug\CountVowels.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\bin\Debug\CountVowels.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\obj\Debug\CountVowels.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\obj\Debug\CountVowels.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\CountVowels\CountVowels\obj\Debug\CountVowels.pdb
