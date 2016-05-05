@@ -10,16 +10,22 @@ namespace FizzBuzz
     {
         static void Main(string[] args)
         {
+            string str;
+
             for(int i = 1; i <= 100; i++)
             {
-                if (i % 3 == 0 && i % 5 == 0)
-                    Console.WriteLine("FizzBuzz");
-                else if (i % 3 == 0)
-                    Console.WriteLine("Fizz");
-                else if (i % 5 == 0)
-                    Console.WriteLine("Buzz");
-                else
-                    Console.WriteLine(i);
+                str = "";
+
+                if (i % 3 == 0)
+                    str += "Fizz";
+
+                if (i % 5 == 0)
+                    str += "Buzz";
+
+                if (str.Length == 0)
+                    str += i;
+
+                Console.WriteLine(str);
             }
             Console.ReadKey();
         }
