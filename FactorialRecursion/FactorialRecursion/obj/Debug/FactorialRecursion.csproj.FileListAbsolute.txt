@@ -1,0 +1,5 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialRecursion\FactorialRecursion\bin\Debug\FactorialRecursion.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialRecursion\FactorialRecursion\bin\Debug\FactorialRecursion.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialRecursion\FactorialRecursion\bin\Debug\FactorialRecursion.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialRecursion\FactorialRecursion\obj\Debug\FactorialRecursion.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialRecursion\FactorialRecursion\obj\Debug\FactorialRecursion.pdb

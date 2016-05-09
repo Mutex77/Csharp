@@ -1,0 +1,6 @@
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\bin\Debug\FactorialLoop.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\bin\Debug\FactorialLoop.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\bin\Debug\FactorialLoop.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\obj\Debug\FactorialLoop.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\obj\Debug\FactorialLoop.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\FactorialLoop\FactorialLoop\obj\Debug\FactorialLoop.pdb
