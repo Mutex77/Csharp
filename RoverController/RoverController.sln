@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoverController", "RoverController\RoverController.csproj", "{4613AB0C-A3BF-43BE-925C-15D84A920651}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoverControllerWPF", "RoverControllerWPF\RoverControllerWPF.csproj", "{AB26D0F6-C5E9-41A0-881E-2EE78BDA6622}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4613AB0C-A3BF-43BE-925C-15D84A920651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4613AB0C-A3BF-43BE-925C-15D84A920651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4613AB0C-A3BF-43BE-925C-15D84A920651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4613AB0C-A3BF-43BE-925C-15D84A920651}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB26D0F6-C5E9-41A0-881E-2EE78BDA6622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB26D0F6-C5E9-41A0-881E-2EE78BDA6622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB26D0F6-C5E9-41A0-881E-2EE78BDA6622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB26D0F6-C5E9-41A0-881E-2EE78BDA6622}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

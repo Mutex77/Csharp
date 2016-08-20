@@ -1,0 +1,38 @@
+﻿<Window x:Class="ClassifyPics.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClassifyPics"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="800">
+    <DockPanel>
+
+        
+
+        <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90px" />
+                <RowDefinition Height="90px" />
+                <RowDefinition Height="75px" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300px"/>
+                <ColumnDefinition Width="300px"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="btnPuppy" Grid.Row="0" Grid.Column="0" Margin="0px 0px 5px 5px">Puppy</Button>
+            <Button Name="btnKitten" Grid.Row="0" Grid.Column="1" Margin="5px 0px 0px 5px">Kitten</Button>
+            <Button Name="btnDog" Grid.Row="1" Grid.Column="0" Margin="0px 5px 5px 0px">Dog</Button>
+            <Button Name="btnCat" Grid.Row="1" Grid.Column="1" Margin="5px 5px 0px 0px">Cat</Button>
+            <Button Name="btnTrash" Grid.Row="2" Grid.ColumnSpan="2" Margin="0px 10px 0px 5px">Trash</Button>
+        </Grid>
+        <Grid>
+            <Canvas Name="imgContainer" Grid.Row="0" Grid.Column="0">
+            <Image Name="img" Height="auto" Margin="10px 30px 10px 40px" Source="C:\Users\Mutex\Pictures\cutepup.jpg"/>
+            
+            <Rectangle Name="cropArea" Height="246px" Width="330px" Margin="10px 30px 10px 40px" Stroke="Black" StrokeThickness="2px"/>
+            <Rectangle Name="blurArea" Height="0px" Width="0px" Margin="10px 10px 10px 40px" Stroke="Red" StrokeThickness="2px"/>
+            </Canvas>
+        </Grid>
+    </DockPanel>
+</Window>
