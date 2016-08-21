@@ -34,7 +34,7 @@ namespace AlarmClock
                 
                 threadTimer = new Thread(new ThreadStart(() => StartTimer(hours, minutes, seconds)));
                 threadTimer.Start();
-                while (!threadTimer.IsAlive) ;
+                while (!threadTimer.IsAlive);
             }
         }
 

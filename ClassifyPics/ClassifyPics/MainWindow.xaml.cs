@@ -23,9 +23,21 @@ namespace ClassifyPics
         public MainWindow()
         {
             InitializeComponent();
-            img.Height = imgContainer.Height;
-            img.Width = imgContainer.Width;
-            img;
+            InitControls();
+        }
+
+        private void InitControls()
+        {
+            int horCenter, verCenter;
+
+            horCenter = (int)imgContainer.Width / 2;
+            verCenter = (int)imgContainer.Height / 2;
+
+            cropArea.Margin = new Thickness(cropTL.Margin.Left + cropTL.Width, cropTL.Margin.Top + cropTL.Height, 0, 0);
+            cropArea.Height = cropBR.Margin.Top - (cropTL.Margin.Top + cropTL.Height);
+            cropArea.Width = cropBR.Margin.Left - (cropTL.Margin.Left + cropTL.Width);
+
+
         }
     }
 }
