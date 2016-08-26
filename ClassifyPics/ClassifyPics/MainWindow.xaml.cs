@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ClassifyPics
 {
@@ -31,10 +32,10 @@ namespace ClassifyPics
 		private List<string>
 			imgFiles;
 		private TouchDevice
-			tdCropTL,
+			//tdCropTL,
 			tdCropBR;
 		private Point
-			ptTLLast,
+			//ptTLLast,
 			ptBRLast;
 
 		public MainWindow()
@@ -50,9 +51,7 @@ namespace ClassifyPics
 			//horCenter = (int)imgContainer.Width / 2;
 			//verCenter = (int)imgContainer.Height / 2;
 
-			//cropArea.Margin = new Thickness(cropTL.Margin.Left + cropTL.Width, cropTL.Margin.Top + cropTL.Height, 0, 0);
-			//cropArea.Height = cropBR.Margin.Top - (cropTL.Margin.Top + cropTL.Height);
-			//cropArea.Width = cropBR.Margin.Left - (cropTL.Margin.Left + cropTL.Width);
+			
 
 
 		}
@@ -136,8 +135,13 @@ namespace ClassifyPics
 		{
 
 		}
-		
-		private void SetNewSourcePath()
+
+        private void btnPuppy_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SetNewSourcePath()
 		{
 			FolderBrowserDialog dialog = new FolderBrowserDialog();
 			DialogResult result = dialog.ShowDialog();
@@ -155,19 +159,67 @@ namespace ClassifyPics
 
 		private void GetPicture()
 		{
+            double imgTop;
+            BitmapImage bitmap;
+
 			var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
 			if(imgFiles == null || imgFiles.Count == 0)
 				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
 			if(extensions.Contains(System.IO.Path.GetExtension(imgFiles[imgFiles.Count - 1])))
 			{
-				img.Source = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+                bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+                img.Source = bitmap;
+                img.MaxHeight = bitmap.PixelHeight;
+                img.MaxWidth = bitmap.PixelWidth;
 
-				imgFiles.RemoveAt(imgFiles.Count - 1);
-			}
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    if (img.MaxHeight >= imgContainer.ActualHeight - 85)
+                    {
+                        img.Height = imgContainer.ActualHeight - 85;
+                        imgTop = 35;
+                    }
+                    else
+                    {
+                        imgTop = ((imgContainer.ActualHeight - img.ActualHeight - 85) / 2) + 35;
+                    }
 
-			if (imgFiles.Count == 0)
+                    Canvas.SetTop(img, imgTop);
+
+                }), DispatcherPriority.ContextIdle);
+
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    
+                    Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
+
+                    Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
+                    Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
+
+                    Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
+                    Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
+
+                    Canvas.SetTop(cropArea, Canvas.GetTop(img));
+                    Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
+                    cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+                    cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+                }), DispatcherPriority.ContextIdle);
+
+                imgFiles.RemoveAt(imgFiles.Count - 1);
+
+                cropBR.Visibility = Visibility.Visible;
+                cropTL.Visibility = Visibility.Visible; 
+                cropArea.Visibility = Visibility.Visible;
+                
+                
+            }
+
+            if (imgFiles.Count == 0)
 			{
-				sourceFolderOpened = false;
+                cropBR.Visibility = Visibility.Hidden;
+                cropTL.Visibility = Visibility.Hidden;
+                cropArea.Visibility = Visibility.Hidden;
+                sourceFolderOpened = false;
 				SetNewSourcePath();
 			}
 		}

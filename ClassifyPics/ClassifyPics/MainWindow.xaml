@@ -106,26 +106,18 @@
 				<ColumnDefinition Width="300px"/>
 				<ColumnDefinition Width="300px"/>
 			</Grid.ColumnDefinitions>
-			<Button x:Name="btnPuppy" Grid.Row="0" Grid.Column="0" Margin="0px 0px 5px 5px" Content="Puppy" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button x:Name="btnPuppy" Click="btnPuppy_Click" Grid.Row="0" Grid.Column="0" Margin="0px 0px 5px 5px" Content="Puppy" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			<Button x:Name="btnKitten" Grid.Row="0" Grid.Column="1" Margin="5px 0px 0px 5px" Content="Kitten" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			<Button x:Name="btnDog" Grid.Row="1" Grid.Column="0" Margin="0px 5px 5px 0px" Content="Dog" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			<Button x:Name="btnCat" Grid.Row="1" Grid.Column="1" Margin="5px 5px 0px 0px" Content="Cat" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			<Button x:Name="btnTrash" Grid.Row="2" Grid.ColumnSpan="2" Margin="0px 10px 0px 5px" Content="Trash" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 		</Grid>
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*"/>
-			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>
-			<Image x:Name="img" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Margin="0px 35px 0px 50px"/>
-			<Canvas x:Name="imgContainer"  Grid.Row="0" Grid.Column="0">
-				<Rectangle Name="cropTL" TouchDown="cropTL_TouchDown" TouchMove="cropTL_TouchMove" TouchUp="cropTL_TouchUp" Height="25px" Width="25px" Margin="0px" Fill="Blue" Visibility="Hidden"/>
-				<Rectangle Name="cropBR" TouchDown="cropBR_TouchDown" TouchMove="cropBR_TouchMove" TouchUp="cropBR_TouchUp" Height="25px" Width="25px" Margin="50px 50px 0px 0px" Fill="Red" Visibility="Hidden"/>
-				<Rectangle x:Name="cropArea" Height="100px" Width="200px" Margin="0px" Stroke="Black" StrokeThickness="1px" Visibility="Hidden"/>
-				<Rectangle x:Name="blurArea" Height="120px" Width="120px" Margin="0px" Stroke="Red" StrokeThickness="1px" Visibility="Hidden"/>
-			</Canvas>
-		</Grid>
+		<Canvas x:Name="imgContainer">
+            <Image x:Name="img" Stretch="Uniform" Canvas.Top="0" Canvas.Left="0" />
+			<Rectangle Name="cropTL" TouchDown="cropTL_TouchDown" TouchMove="cropTL_TouchMove" TouchUp="cropTL_TouchUp" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Blue" Visibility="Hidden"/>
+			<Rectangle Name="cropBR" TouchDown="cropBR_TouchDown" TouchMove="cropBR_TouchMove" TouchUp="cropBR_TouchUp" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Red" Visibility="Hidden"/>
+			<Rectangle x:Name="cropArea" Height="100px" Width="200px" Canvas.Top="0" Canvas.Left="0" Stroke="Black" StrokeThickness="1px" Visibility="Hidden"/>
+			<Rectangle x:Name="blurArea" Height="120px" Width="120px" Canvas.Top="0" Canvas.Left="0" Stroke="Red" StrokeThickness="1px" Visibility="Hidden"/>
+		</Canvas>
 	</DockPanel>
 </Window>
