@@ -27,3 +27,6 @@ C:\Users\Mutex\Documents\Visual Studio 2015\Projects\RoverController\RoverContro
 C:\Users\Mutex\Documents\Visual Studio 2015\Projects\RoverController\RoverControllerWPF\obj\Debug\RoverControllerWPF.csproj.GenerateResource.Cache
 C:\Users\Mutex\Documents\Visual Studio 2015\Projects\RoverController\RoverControllerWPF\obj\Debug\RoverControllerWPF.exe
 C:\Users\Mutex\Documents\Visual Studio 2015\Projects\RoverController\RoverControllerWPF\obj\Debug\RoverControllerWPF.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\RoverController\RoverControllerWPF\bin\Debug\RoverControllerWPF.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\RoverController\RoverControllerWPF\obj\Debug\RoverControllerWPF.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\RoverController\RoverControllerWPF\obj\Debug\RoverControllerWPF.pdb
