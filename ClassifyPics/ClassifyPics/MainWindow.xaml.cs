@@ -28,48 +28,55 @@ namespace ClassifyPics
 			destinationPath;
 		private bool
 			sourceFolderOpened = false,
-			destinationFolderOpened = false;
+			destinationFolderOpened = false,
+			lmdCropTL = false,
+			lmdCropBR = false,
+			cropping = false;
 		private List<string>
 			imgFiles;
 		private TouchDevice
-			//tdCropTL,
+			tdCropTL,
 			tdCropBR;
 		private Point
-			//ptTLLast,
+			ptTLLast,
 			ptBRLast;
+			
 
 		public MainWindow()
 		{
 			InitializeComponent();
-			InitControls();
 		}
 
-		private void InitControls()
+		#region Window Events
+		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			//int horCenter, verCenter;
+			double imgTop;
 
-			//horCenter = (int)imgContainer.Width / 2;
-			//verCenter = (int)imgContainer.Height / 2;
+			CropTerminate();
 
-			
-
-
-		}
-
-		private void btnSource_Click(object sender, System.EventArgs e)
-		{            
-			FolderBrowserDialog dialog = new FolderBrowserDialog();
-			DialogResult result = dialog.ShowDialog();
-			if(result.ToString() == "OK")
+			if (img.Source != null)
 			{
-				sourcePath = dialog.SelectedPath;
-				sourceFolderOpened = true;
-				if (imgFiles != null && imgFiles.Count > 0)
-					imgFiles.Clear();
-			}
+				if (img.MaxHeight >= imgContainer.ActualHeight - 85)
+				{
+					img.Height = imgContainer.ActualHeight - 85;
+					imgTop = 35;
+				}
+				else
+				{
+					img.Height = img.MaxHeight;
+					imgTop = ((imgContainer.ActualHeight - img.ActualHeight - 85) / 2) + 35;
+				}
 
-			if (sourceFolderOpened && destinationFolderOpened)
-				GetPicture();
+				Canvas.SetTop(img, imgTop);
+				Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
+			}
+		}
+		#endregion
+
+		#region Source and Destination Events
+		private void btnSource_Click(object sender, System.EventArgs e)
+		{
+			SetNewSourcePath();
 		}
 
 		private void btnDestination_Click(object sender, System.EventArgs e)
@@ -85,7 +92,44 @@ namespace ClassifyPics
 			if (sourceFolderOpened && destinationFolderOpened)
 				GetPicture();
 		}
+		#endregion
 
+		#region CropBR Mouse Events
+		private void cropBR_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			lmdCropBR = true;
+			cropBR.CaptureMouse();
+		}
+
+		private void cropBR_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			lmdCropBR = false;
+			cropBR.ReleaseMouseCapture();
+		}
+
+		private void cropBR_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			double top, left;
+			if(lmdCropBR)
+			{
+				top = Canvas.GetTop(img) + e.GetPosition(img).Y - (cropBR.ActualHeight / 2);
+				left = Canvas.GetLeft(img) + e.GetPosition(img).X - (cropBR.ActualWidth / 2);
+
+				if(top > Canvas.GetTop(cropTL) + cropTL.ActualHeight)
+					Canvas.SetTop(cropBR, top);
+
+				if(left > Canvas.GetLeft(cropTL) + cropTL.ActualWidth)
+					Canvas.SetLeft(cropBR, left);
+
+				Canvas.SetTop(cropArea, Canvas.GetTop(cropTL) + cropTL.ActualHeight);
+				Canvas.SetLeft(cropArea, Canvas.GetLeft(cropTL) + cropTL.ActualWidth);
+				cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+				cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+			}
+		}
+		#endregion
+
+		#region CropBR Touch Events
 		private void cropBR_TouchDown(object sender, TouchEventArgs e)
 		{
 			e.TouchDevice.Capture(cropBR);
@@ -98,16 +142,6 @@ namespace ClassifyPics
 			}
 
 			e.Handled = true;
-
-
-			//if (tdRightSlider == null)
-			//{
-			//	tdRightSlider = e.TouchDevice;
-			//	ptRightLast = tdRightSlider.GetTouchPoint(imgRightTrack).Position;
-			//	Canvas.SetTop(rightSlider, Canvas.GetTop(imgRightTrack) + (ptRightLast.Y - (rightSlider.ActualHeight / 2)));
-			//}
-
-			//e.Handled = true;
 		}
 
 		private void cropBR_TouchMove(object sender, TouchEventArgs e)
@@ -119,8 +153,44 @@ namespace ClassifyPics
 		{
 
 		}
-		
+		#endregion
 
+		#region CropTL Mouse Events
+		private void cropTL_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			lmdCropTL = true;
+			cropTL.CaptureMouse();
+		}
+
+		private void cropTL_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			lmdCropTL = false;
+			cropTL.ReleaseMouseCapture();
+		}
+
+		private void cropTL_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			double top, left;
+			if(lmdCropTL)
+			{
+				top = Canvas.GetTop(img) + e.GetPosition(img).Y - (cropTL.ActualHeight / 2);
+				left = Canvas.GetLeft(img) + e.GetPosition(img).X - (cropTL.ActualWidth / 2);
+
+				if(top < Canvas.GetTop(cropBR) - cropTL.ActualHeight)
+					Canvas.SetTop(cropTL, top);
+
+				if(left < Canvas.GetLeft(cropBR) - cropTL.ActualWidth)
+					Canvas.SetLeft(cropTL, left);
+
+				Canvas.SetTop(cropArea, Canvas.GetTop(cropTL) + cropTL.ActualHeight);
+				Canvas.SetLeft(cropArea, Canvas.GetLeft(cropTL) + cropTL.ActualWidth);
+				cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+				cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+			}
+		}
+		#endregion
+
+		#region CropTL Touch Events
 		private void cropTL_TouchDown(object sender, TouchEventArgs e)
 		{
 
@@ -135,14 +205,30 @@ namespace ClassifyPics
 		{
 
 		}
+		#endregion
 
-        private void btnPuppy_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void SetNewSourcePath()
+		#region Button Events
+		private void btnCrop_Click(object sender, RoutedEventArgs e)
 		{
+			CropBegin();
+		}
+
+		private void btnBlur_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnPuppy_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+		#endregion
+
+		#region Image Functions
+		private void SetNewSourcePath()
+		{
+			CropTerminate();
+
 			FolderBrowserDialog dialog = new FolderBrowserDialog();
 			DialogResult result = dialog.ShowDialog();
 			if (result.ToString() == "OK")
@@ -159,69 +245,88 @@ namespace ClassifyPics
 
 		private void GetPicture()
 		{
-            double imgTop;
-            BitmapImage bitmap;
+			double imgTop;
+			BitmapImage bitmap;
+
+			CropTerminate();
 
 			var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
-			if(imgFiles == null || imgFiles.Count == 0)
+			if (sourceFolderOpened && imgFiles == null)
+			{
 				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
-			if(extensions.Contains(System.IO.Path.GetExtension(imgFiles[imgFiles.Count - 1])))
+			}
+			else if (sourceFolderOpened && imgFiles.Count == 0)
 			{
-                bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
-                img.Source = bitmap;
-                img.MaxHeight = bitmap.PixelHeight;
-                img.MaxWidth = bitmap.PixelWidth;
-
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    if (img.MaxHeight >= imgContainer.ActualHeight - 85)
-                    {
-                        img.Height = imgContainer.ActualHeight - 85;
-                        imgTop = 35;
-                    }
-                    else
-                    {
-                        imgTop = ((imgContainer.ActualHeight - img.ActualHeight - 85) / 2) + 35;
-                    }
-
-                    Canvas.SetTop(img, imgTop);
-
-                }), DispatcherPriority.ContextIdle);
-
-                Dispatcher.Invoke(new Action(() =>
-                {
-                    
-                    Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
-
-                    Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
-                    Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
-
-                    Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
-                    Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
-
-                    Canvas.SetTop(cropArea, Canvas.GetTop(img));
-                    Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
-                    cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
-                    cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
-                }), DispatcherPriority.ContextIdle);
-
-                imgFiles.RemoveAt(imgFiles.Count - 1);
-
-                cropBR.Visibility = Visibility.Visible;
-                cropTL.Visibility = Visibility.Visible; 
-                cropArea.Visibility = Visibility.Visible;
-                
-                
-            }
-
-            if (imgFiles.Count == 0)
-			{
-                cropBR.Visibility = Visibility.Hidden;
-                cropTL.Visibility = Visibility.Hidden;
-                cropArea.Visibility = Visibility.Hidden;
-                sourceFolderOpened = false;
+				sourceFolderOpened = false;
 				SetNewSourcePath();
+				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
+			}
+
+			if (sourceFolderOpened && extensions.Contains(System.IO.Path.GetExtension(imgFiles[imgFiles.Count - 1])))
+			{
+				bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+				img.Source = bitmap;
+				img.MaxHeight = bitmap.PixelHeight;
+				img.MaxWidth = bitmap.PixelWidth;
+
+				Dispatcher.Invoke(new Action(() =>
+				{
+					if (img.MaxHeight >= imgContainer.ActualHeight - 85)
+					{
+						img.Height = imgContainer.ActualHeight - 85;
+						imgTop = 35;
+					}
+					else
+					{
+						img.Height = img.MaxHeight;
+						imgTop = ((imgContainer.ActualHeight - img.ActualHeight - 85) / 2) + 35;
+					}
+
+					Canvas.SetTop(img, imgTop);
+					Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
+				}), DispatcherPriority.ContextIdle);
+
+				imgFiles.RemoveAt(imgFiles.Count - 1);
+				
 			}
 		}
+		#endregion
+
+		#region Crop Functions
+		private void CropBegin()
+		{
+			if (img.Source != null)
+			{
+				Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
+				Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
+
+				Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
+				Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
+
+				Canvas.SetTop(cropArea, Canvas.GetTop(img));
+				Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
+				cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+				cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+
+				cropping = true;
+				cropBR.Visibility = Visibility.Visible;
+				cropTL.Visibility = Visibility.Visible;
+				cropArea.Visibility = Visibility.Visible;
+			}
+		}
+
+		private void CropConfirm()
+		{
+
+		}
+
+		private void CropTerminate()
+		{
+			cropping = false;
+			cropBR.Visibility = Visibility.Hidden;
+			cropTL.Visibility = Visibility.Hidden;
+			cropArea.Visibility = Visibility.Hidden;
+		}
+		#endregion
 	}
 }
