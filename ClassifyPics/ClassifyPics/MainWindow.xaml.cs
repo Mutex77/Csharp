@@ -31,7 +31,8 @@ namespace ClassifyPics
 			destinationFolderOpened = false,
 			lmdCropTL = false,
 			lmdCropBR = false,
-			cropping = false;
+			cropping = false,
+			blurring = false;
 		private List<string>
 			imgFiles;
 		private TouchDevice
@@ -115,10 +116,10 @@ namespace ClassifyPics
 				top = Canvas.GetTop(img) + e.GetPosition(img).Y - (cropBR.ActualHeight / 2);
 				left = Canvas.GetLeft(img) + e.GetPosition(img).X - (cropBR.ActualWidth / 2);
 
-				if(top > Canvas.GetTop(cropTL) + cropTL.ActualHeight)
+				if(top > Canvas.GetTop(cropTL) + cropTL.ActualHeight && top < Canvas.GetTop(img) + img.ActualHeight)
 					Canvas.SetTop(cropBR, top);
 
-				if(left > Canvas.GetLeft(cropTL) + cropTL.ActualWidth)
+				if(left > Canvas.GetLeft(cropTL) + cropTL.ActualWidth && left < Canvas.GetLeft(img) + img.ActualWidth)
 					Canvas.SetLeft(cropBR, left);
 
 				Canvas.SetTop(cropArea, Canvas.GetTop(cropTL) + cropTL.ActualHeight);
@@ -176,10 +177,10 @@ namespace ClassifyPics
 				top = Canvas.GetTop(img) + e.GetPosition(img).Y - (cropTL.ActualHeight / 2);
 				left = Canvas.GetLeft(img) + e.GetPosition(img).X - (cropTL.ActualWidth / 2);
 
-				if(top < Canvas.GetTop(cropBR) - cropTL.ActualHeight)
+				if(top < Canvas.GetTop(cropBR) - cropTL.ActualHeight && top > Canvas.GetTop(img) - cropTL.ActualHeight)
 					Canvas.SetTop(cropTL, top);
 
-				if(left < Canvas.GetLeft(cropBR) - cropTL.ActualWidth)
+				if(left < Canvas.GetLeft(cropBR) - cropTL.ActualWidth && left > Canvas.GetLeft(img) - cropTL.ActualWidth)
 					Canvas.SetLeft(cropTL, left);
 
 				Canvas.SetTop(cropArea, Canvas.GetTop(cropTL) + cropTL.ActualHeight);
@@ -215,10 +216,55 @@ namespace ClassifyPics
 
 		private void btnBlur_Click(object sender, RoutedEventArgs e)
 		{
+			BlurBegin();
+		}
 
+		private void btnConfirm_Click(object sender, RoutedEventArgs e)
+		{
+			if(cropping)
+			{
+				CropConfirm();
+			}
+			else if (blurring)
+			{
+				BlurConfirm();
+			}
+		}
+
+		private void btnCancel_Click(object sender, RoutedEventArgs e)
+		{
+			if (cropping)
+			{
+				CropTerminate();
+			}
+			else if (blurring)
+			{
+				BlurTerminate();
+			}
 		}
 
 		private void btnPuppy_Click(object sender, RoutedEventArgs e)
+		{
+			BitmapImage bi = new BitmapImage();
+			
+		}
+
+		private void btnKitten_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnDog_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnCat_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
 
 		}
@@ -309,6 +355,12 @@ namespace ClassifyPics
 				cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
 
 				cropping = true;
+
+				btnCrop.IsEnabled = false;
+
+				btnConfirm.Visibility = Visibility.Visible;
+				btnCancel.Visibility = Visibility.Visible;
+
 				cropBR.Visibility = Visibility.Visible;
 				cropTL.Visibility = Visibility.Visible;
 				cropArea.Visibility = Visibility.Visible;
@@ -317,12 +369,97 @@ namespace ClassifyPics
 
 		private void CropConfirm()
 		{
+			//perform crop
+			//Need to convert incoming images to a standard type, then process crops and blurs. JPG and PNG have big problems.
 
+			if (img.Source != null)
+			{
+				Rect rect1 = new Rect(Canvas.GetLeft(cropArea) - Canvas.GetLeft(img), Canvas.GetTop(cropArea) - Canvas.GetTop(img), cropArea.ActualWidth, cropArea.ActualHeight);
+				Int32Rect crpRect = new Int32Rect();
+				crpRect.X = (int)(rect1.X * (img.Source.Width / img.ActualWidth));
+				crpRect.Y = (int)(rect1.Y * (img.Source.Height / img.ActualHeight));
+				crpRect.Width = (int)(rect1.Width * (img.Source.Width / img.ActualWidth));
+				crpRect.Height = (int)(rect1.Height * (img.Source.Height / img.ActualHeight));
+				BitmapSource crpImg = new CroppedBitmap(img.Source as BitmapSource, crpRect);
+				img.Source = crpImg;
+			}
+
+			cropping = false;
+			btnCrop.IsEnabled = true;
+
+			btnConfirm.Visibility = Visibility.Hidden;
+			btnCancel.Visibility = Visibility.Hidden;
+
+			cropBR.Visibility = Visibility.Hidden;
+			cropTL.Visibility = Visibility.Hidden;
+			cropArea.Visibility = Visibility.Hidden;
+			
 		}
 
 		private void CropTerminate()
 		{
 			cropping = false;
+			btnCrop.IsEnabled = true;
+
+			btnConfirm.Visibility = Visibility.Hidden;
+			btnCancel.Visibility = Visibility.Hidden;
+
+			cropBR.Visibility = Visibility.Hidden;
+			cropTL.Visibility = Visibility.Hidden;
+			cropArea.Visibility = Visibility.Hidden;
+		}
+		#endregion
+
+		#region Blur Functions
+		private void BlurBegin()
+		{
+			Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
+			Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
+
+			Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
+			Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
+
+			Canvas.SetTop(cropArea, Canvas.GetTop(img));
+			Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
+			cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+			cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+
+			blurring = true;
+
+			btnBlur.IsEnabled = false;
+
+			btnConfirm.Visibility = Visibility.Visible;
+			btnCancel.Visibility = Visibility.Visible;
+
+			cropBR.Visibility = Visibility.Visible;
+			cropTL.Visibility = Visibility.Visible;
+			cropArea.Visibility = Visibility.Visible;
+		}
+
+		private void BlurConfirm()
+		{
+			//perform blur
+
+
+			blurring = false;
+			btnBlur.IsEnabled = true;
+
+			btnConfirm.Visibility = Visibility.Hidden;
+			btnCancel.Visibility = Visibility.Hidden;
+
+			cropBR.Visibility = Visibility.Hidden;
+			cropTL.Visibility = Visibility.Hidden;
+			cropArea.Visibility = Visibility.Hidden;
+		}
+
+		private void BlurTerminate()
+		{
+			blurring = false;
+			btnBlur.IsEnabled = true;
+
+			btnConfirm.Visibility = Visibility.Hidden;
+			btnCancel.Visibility = Visibility.Hidden;
+
 			cropBR.Visibility = Visibility.Hidden;
 			cropTL.Visibility = Visibility.Hidden;
 			cropArea.Visibility = Visibility.Hidden;

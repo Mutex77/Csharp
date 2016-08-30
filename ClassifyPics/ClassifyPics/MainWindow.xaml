@@ -109,12 +109,14 @@
 				<ColumnDefinition Width="100px"/>
 			</Grid.ColumnDefinitions>
 			<Button x:Name="btnPuppy" Click="btnPuppy_Click" Grid.Row="0" Grid.Column="1" Margin="0px 0px 5px 5px" Content="Puppy" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button x:Name="btnKitten" Grid.Row="0" Grid.Column="2" Margin="5px 0px 0px 5px" Content="Kitten" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button x:Name="btnDog" Grid.Row="1" Grid.Column="1" Margin="0px 5px 5px 0px" Content="Dog" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button x:Name="btnCat" Grid.Row="1" Grid.Column="2" Margin="5px 5px 0px 0px" Content="Cat" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button x:Name="btnTrash" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0px 10px 0px 5px" Content="Trash" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button Name="btnCrop" Click="btnCrop_Click" Grid.Row="0" Grid.Column="3" Margin="5px 0px 5px 5px" Content="Crop" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-			<Button Name="btnBlur" Click="btnBlur_Click" Grid.Row="1" Grid.Column="3" Margin="5px 5px 5px 0px" Content="Blur" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button x:Name="btnKitten" Click="btnKitten_Click" Grid.Row="0" Grid.Column="2" Margin="5px 0px 0px 5px" Content="Kitten" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button x:Name="btnDog" Click="btnDog_Click" Grid.Row="1" Grid.Column="1" Margin="0px 5px 5px 0px" Content="Dog" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button x:Name="btnCat" Click="btnCat_Click" Grid.Row="1" Grid.Column="2" Margin="5px 5px 0px 0px" Content="Cat" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button x:Name="btnTrash" Click="btnTrash_Click" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="0px 10px 0px 5px" Content="Trash" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button Name="btnCrop" Click="btnCrop_Click" Grid.Row="0" Grid.Column="0" Margin="5px 0px 5px 5px" Content="Crop" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button Name="btnBlur" Click="btnBlur_Click" Grid.Row="1" Grid.Column="0" Margin="5px 5px 5px 0px" Content="Blur" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+			<Button Name="btnConfirm" Click="btnConfirm_Click" Grid.Row="0" Grid.Column="3" Margin="5px 0px 5px 5px" Content="Confirm" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
+			<Button Name="btnCancel" Click="btnCancel_Click" Grid.Row="1" Grid.Column="3" Margin="5px 5px 5px 0px" Content="Cancel" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
 		</Grid>
 		<Canvas x:Name="imgContainer">
 			<Image x:Name="img" Stretch="Uniform" Canvas.Top="0" Canvas.Left="0" />
