@@ -12,3 +12,17 @@ C:\Users\Mutex\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\Class
 C:\Users\Mutex\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.csproj.GenerateResource.Cache
 C:\Users\Mutex\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.exe
 C:\Users\Mutex\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\bin\Debug\ClassifyPics.exe.config
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\bin\Debug\ClassifyPics.exe
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\bin\Debug\ClassifyPics.pdb
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.csprojResolveAssemblyReference.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\MainWindow.g.cs
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\App.g.cs
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics_MarkupCompile.cache
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics_MarkupCompile.lref
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\MainWindow.baml
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.g.resources
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.Properties.Resources.resources
+C:\Users\Phoenix\Documents\GitHub\Csharp\ClassifyPics\ClassifyPics\obj\Debug\ClassifyPics.csproj.GenerateResource.Cache

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace ClassifyPics
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private const bool TESTING = true;
 		private string
 			sourcePath, 
 			destinationPath;
@@ -37,9 +39,10 @@ namespace ClassifyPics
 			styCropBR = false,
 			cropping = false,
 			blurring = false;
+			
 		private List<string>
 			imgFiles;
-		private Point
+		private System.Windows.Point
 			ptTLLast,
 			ptBRLast;
 			
@@ -47,7 +50,7 @@ namespace ClassifyPics
 		public MainWindow()
 		{
 			InitializeComponent();
-
+			
 			cropTL.MouseLeftButtonDown += new MouseButtonEventHandler(cropTL_MouseLeftButtonDown);
 			cropTL.MouseMove += new System.Windows.Input.MouseEventHandler(cropTL_MouseMove);
 			cropTL.MouseLeftButtonUp += new MouseButtonEventHandler(cropTL_MouseLeftButtonUp);
@@ -61,7 +64,10 @@ namespace ClassifyPics
 			cropBR.TouchDown += new EventHandler<TouchEventArgs>(cropBR_TouchDown);
 			cropBR.TouchMove += new EventHandler<TouchEventArgs>(cropBR_TouchMove);
 			cropBR.TouchUp += new EventHandler<TouchEventArgs>(cropBR_TouchUp);
+
+
 		}
+
 
 		#region Window Events
 		//################################################################################################
@@ -69,8 +75,20 @@ namespace ClassifyPics
 		//##									Window Events											##
 		//##																							##
 		//################################################################################################
+		
+		private void appWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (TESTING)
+			{
+				sourcePath = "C:\\Users\\Phoenix\\Pictures";
+				destinationPath = "C:\\";
+				sourceFolderOpened = true;
+				destinationFolderOpened = true;
+				GetFirstPicture();
+			}
+		}
 
-		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+		private void appWindow_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			double imgTop;
 
@@ -326,7 +344,7 @@ namespace ClassifyPics
 			}
 
 			if (sourceFolderOpened && destinationFolderOpened)
-				GetPicture();
+				GetFirstPicture();
 		}
 
 		private void btnCrop_Click(object sender, RoutedEventArgs e)
@@ -365,7 +383,24 @@ namespace ClassifyPics
 
 		private void btnPuppy_Click(object sender, RoutedEventArgs e)
 		{
-			
+			if(!Directory.Exists(destinationPath + "\\Puppies"))
+			{
+				Directory.CreateDirectory(destinationPath + "\\Puppies");
+			}
+
+			FileStream fs = new FileStream(destinationPath + "\\Puppies\\testing.jpg", FileMode.Create);
+			JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+			encoder.Frames.Add(BitmapFrame.Create(img.Source as BitmapSource));
+			encoder.QualityLevel = 50;
+			encoder.Save(fs);
+
+			fs.Flush();
+			fs.Dispose();
+			encoder = null;
+			img.Source = null;
+			//File.Delete((img.Source as BitmapImage).UriSource.LocalPath);
+
+			GetPicture();
 		}
 
 		private void btnKitten_Click(object sender, RoutedEventArgs e)
@@ -398,7 +433,8 @@ namespace ClassifyPics
 
 		private void SetNewSourcePath()
 		{
-			CropTerminate();
+			if(cropping)
+				CropTerminate();
 
 			FolderBrowserDialog dialog = new FolderBrowserDialog();
 			DialogResult result = dialog.ShowDialog();
@@ -411,7 +447,51 @@ namespace ClassifyPics
 			}
 
 			if (sourceFolderOpened && destinationFolderOpened)
-				GetPicture();
+				GetFirstPicture();
+		}
+
+		private void GetFirstPicture()
+		{
+			double imgTop;
+			BitmapImage bitmap;
+
+			if (sourceFolderOpened && destinationFolderOpened)
+			{
+				var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
+				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
+
+				for(int i = imgFiles.Count - 1; i >= 0; i--)
+				{
+					if (!extensions.Contains(System.IO.Path.GetExtension(imgFiles[i])))
+					{
+						imgFiles.RemoveAt(i);
+					}
+				}
+				
+				bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+				img.Source = bitmap;
+				img.MaxHeight = bitmap.PixelHeight;
+				img.MaxWidth = bitmap.PixelWidth;
+
+				Dispatcher.Invoke(new Action(() =>
+				{
+					if (img.MaxHeight >= imgContainer.ActualHeight - 85)
+					{
+						img.Height = imgContainer.ActualHeight - 85;
+						imgTop = 35;
+					}
+					else
+					{
+						img.Height = img.MaxHeight;
+						imgTop = ((imgContainer.ActualHeight - img.ActualHeight - 85) / 2) + 35;
+					}
+
+					Canvas.SetTop(img, imgTop);
+					Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
+				}), DispatcherPriority.ContextIdle);
+
+				imgFiles.RemoveAt(imgFiles.Count - 1);
+			}
 		}
 
 		private void GetPicture()
@@ -419,21 +499,22 @@ namespace ClassifyPics
 			double imgTop;
 			BitmapImage bitmap;
 
-			CropTerminate();
-
-			var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
-			if (sourceFolderOpened && imgFiles == null)
+			if(cropping)
+				CropTerminate();
+			
+			if(!sourceFolderOpened)
 			{
-				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
+				System.Windows.MessageBox.Show("No source folder selected. Please select a source folder.");
+				SetNewSourcePath();
 			}
-			else if (sourceFolderOpened && imgFiles.Count == 0)
+			else if (imgFiles == null || imgFiles.Count == 0)
 			{
 				sourceFolderOpened = false;
+				imgFiles = null;
+				System.Windows.MessageBox.Show("No more images available. Please select a new source folder.");
 				SetNewSourcePath();
-				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
 			}
-
-			if (sourceFolderOpened && extensions.Contains(System.IO.Path.GetExtension(imgFiles[imgFiles.Count - 1])))
+			else
 			{
 				bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
 				img.Source = bitmap;
@@ -458,7 +539,6 @@ namespace ClassifyPics
 				}), DispatcherPriority.ContextIdle);
 
 				imgFiles.RemoveAt(imgFiles.Count - 1);
-				
 			}
 		}
 		#endregion
@@ -510,10 +590,10 @@ namespace ClassifyPics
 										cropArea.ActualWidth, 
 										cropArea.ActualHeight);
 				Int32Rect crpRect = new Int32Rect();
-				crpRect.X = (int)(rect1.X * (img.Source.Width / img.ActualWidth));
-				crpRect.Y = (int)(rect1.Y * (img.Source.Height / img.ActualHeight));
-				crpRect.Width = (int)(rect1.Width * (img.Source.Width / img.ActualWidth));
-				crpRect.Height = (int)(rect1.Height * (img.Source.Height / img.ActualHeight));
+				crpRect.X = (int)(rect1.X * ((img.Source as BitmapSource).PixelWidth / img.ActualWidth));
+				crpRect.Y = (int)(rect1.Y * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
+				crpRect.Width = (int)(rect1.Width * ((img.Source as BitmapSource).PixelWidth / img.ActualWidth));
+				crpRect.Height = (int)(rect1.Height * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
 				BitmapSource crpImg = new CroppedBitmap(img.Source as BitmapSource, crpRect);
 				img.Source = crpImg;
 			}
