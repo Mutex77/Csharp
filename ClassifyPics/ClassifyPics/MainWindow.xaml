@@ -120,8 +120,8 @@
 		</Grid>
 		<Canvas x:Name="imgContainer">
 			<Image x:Name="img" Stretch="Uniform" Canvas.Top="0" Canvas.Left="0" />
-			<Rectangle Name="cropTL" MouseLeftButtonDown="cropTL_MouseLeftButtonDown" MouseMove="cropTL_MouseMove" MouseLeftButtonUp="cropTL_MouseLeftButtonUp" TouchDown="cropTL_TouchDown" TouchMove="cropTL_TouchMove" TouchUp="cropTL_TouchUp" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Blue" Visibility="Hidden"/>
-			<Rectangle Name="cropBR" MouseLeftButtonDown="cropBR_MouseLeftButtonDown" MouseMove="cropBR_MouseMove" MouseLeftButtonUp="cropBR_MouseLeftButtonUp" TouchDown="cropBR_TouchDown" TouchMove="cropBR_TouchMove" TouchUp="cropBR_TouchUp" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Red" Visibility="Hidden"/>
+			<Rectangle Name="cropTL" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Blue" Visibility="Hidden"/>
+			<Rectangle Name="cropBR" Height="25px" Width="25px" Canvas.Top="0" Canvas.Left="0" Fill="Red" Visibility="Hidden"/>
 			<Rectangle x:Name="cropArea" Height="100px" Width="200px" Canvas.Top="0" Canvas.Left="0" Stroke="Black" StrokeThickness="1px" Visibility="Hidden"/>
 			<Rectangle x:Name="blurArea" Height="120px" Width="120px" Canvas.Top="0" Canvas.Left="0" Stroke="Red" StrokeThickness="1px" Visibility="Hidden"/>
 		</Canvas>
