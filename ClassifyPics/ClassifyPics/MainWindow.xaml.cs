@@ -3,18 +3,11 @@ using System.IO;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ClassifyPics
@@ -80,7 +73,7 @@ namespace ClassifyPics
 		{
 			if (TESTING)
 			{
-				sourcePath = "C:\\Users\\Phoenix\\Pictures";
+				sourcePath = "C:\\Users\\Mutex\\Pictures";
 				destinationPath = "C:\\";
 				sourceFolderOpened = true;
 				destinationFolderOpened = true;
@@ -383,44 +376,68 @@ namespace ClassifyPics
 
 		private void btnPuppy_Click(object sender, RoutedEventArgs e)
 		{
-			if(!Directory.Exists(destinationPath + "\\Puppies"))
-			{
-				Directory.CreateDirectory(destinationPath + "\\Puppies");
-			}
-
-			FileStream fs = new FileStream(destinationPath + "\\Puppies\\testing.jpg", FileMode.Create);
-			JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-			encoder.Frames.Add(BitmapFrame.Create(img.Source as BitmapSource));
-			encoder.QualityLevel = 50;
-			encoder.Save(fs);
-
-			fs.Flush();
-			fs.Dispose();
-			encoder = null;
-			img.Source = null;
-			//File.Delete((img.Source as BitmapImage).UriSource.LocalPath);
-
-			GetPicture();
+			CategorizeImage("Puppy");
 		}
 
 		private void btnKitten_Click(object sender, RoutedEventArgs e)
 		{
-
+			CategorizeImage("Kitten");
 		}
 
 		private void btnDog_Click(object sender, RoutedEventArgs e)
 		{
-
+			CategorizeImage("Dog");
 		}
 
 		private void btnCat_Click(object sender, RoutedEventArgs e)
 		{
-
+			CategorizeImage("Cat");
 		}
 
 		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
+			CategorizeImage("Trash");
+		}
 
+		private void CategorizeImage(string category)
+		{
+			bool isUnique = false;
+			string unique = "";
+
+            if (cropping)
+				CropConfirm();
+
+			if (blurring)
+				BlurConfirm();
+
+			if (Directory.Exists(destinationPath) && img.Source != null)
+			{
+				if (!Directory.Exists(destinationPath + "\\" + category))
+				{
+					Directory.CreateDirectory(destinationPath + "\\" + category);
+				}
+
+				while(!isUnique)
+				{
+					unique = string.Format(@"{0}.txt", Guid.NewGuid());
+					if (!File.Exists(destinationPath + "\\" + category + "\\" + category + "_" + unique + ".jpg"))
+						isUnique = true;
+				}
+				
+				FileStream fs = new FileStream(destinationPath + "\\" + category + "\\" + category + "_" + unique + ".jpg", FileMode.Create);
+				JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(img.Source as BitmapSource));
+				encoder.QualityLevel = 50;
+				encoder.Save(fs);
+
+				fs.Flush();
+				fs.Dispose();
+				encoder = null;
+				img.Source = null;
+				//File.Delete((img.Source as BitmapImage).UriSource.LocalPath);
+
+				GetPicture();
+			}
 		}
 		#endregion
 
@@ -455,7 +472,7 @@ namespace ClassifyPics
 			double imgTop;
 			BitmapImage bitmap;
 
-			if (sourceFolderOpened && destinationFolderOpened)
+			if (sourceFolderOpened && destinationFolderOpened && Directory.Exists(sourcePath) && Directory.Exists(destinationPath))
 			{
 				var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
 				imgFiles = Directory.EnumerateFiles(sourcePath, "*.*", SearchOption.AllDirectories).ToList<string>();
@@ -580,9 +597,6 @@ namespace ClassifyPics
 
 		private void CropConfirm()
 		{
-			//perform crop
-			//Need to convert incoming images to a standard type, then process crops and blurs. JPG and PNG have big problems.
-
 			if (img.Source != null)
 			{
 				Rect rect1 = new Rect(	Canvas.GetLeft(cropArea) - Canvas.GetLeft(img), 
@@ -633,34 +647,51 @@ namespace ClassifyPics
 
 		private void BlurBegin()
 		{
-			Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
-			Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
+			if (img.Source != null)
+			{
+				Canvas.SetTop(cropTL, Canvas.GetTop(img) - cropTL.ActualHeight);
+				Canvas.SetLeft(cropTL, Canvas.GetLeft(img) - cropTL.ActualWidth);
 
-			Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
-			Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
+				Canvas.SetTop(cropBR, Canvas.GetTop(img) + img.ActualHeight);
+				Canvas.SetLeft(cropBR, Canvas.GetLeft(img) + img.ActualWidth);
 
-			Canvas.SetTop(cropArea, Canvas.GetTop(img));
-			Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
-			cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
-			cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
+				Canvas.SetTop(cropArea, Canvas.GetTop(img));
+				Canvas.SetLeft(cropArea, Canvas.GetLeft(img));
+				cropArea.Height = Canvas.GetTop(cropBR) - (Canvas.GetTop(cropTL) + cropTL.Height);
+				cropArea.Width = Canvas.GetLeft(cropBR) - (Canvas.GetLeft(cropTL) + cropTL.Width);
 
-			blurring = true;
+				blurring = true;
 
-			btnBlur.IsEnabled = false;
+				btnBlur.IsEnabled = false;
 
-			btnConfirm.Visibility = Visibility.Visible;
-			btnCancel.Visibility = Visibility.Visible;
+				btnConfirm.Visibility = Visibility.Visible;
+				btnCancel.Visibility = Visibility.Visible;
 
-			cropBR.Visibility = Visibility.Visible;
-			cropTL.Visibility = Visibility.Visible;
-			cropArea.Visibility = Visibility.Visible;
+				cropBR.Visibility = Visibility.Visible;
+				cropTL.Visibility = Visibility.Visible;
+				cropArea.Visibility = Visibility.Visible;
+			}
 		}
 
 		private void BlurConfirm()
 		{
-			//perform blur
-
-
+			if(img.Source != null)
+			{
+				Rect rect1 = new Rect(Canvas.GetLeft(cropArea) - Canvas.GetLeft(img),
+										Canvas.GetTop(cropArea) - Canvas.GetTop(img),
+										cropArea.ActualWidth,
+										cropArea.ActualHeight);
+				System.Drawing.Rectangle blurRect = new System.Drawing.Rectangle();
+				blurRect.X = (int)(rect1.X * ((img.Source as BitmapSource).PixelWidth / img.ActualWidth));
+				blurRect.Y = (int)(rect1.Y * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
+				blurRect.Width = (int)(rect1.Width * ((img.Source as BitmapSource).PixelWidth / img.ActualWidth));
+				blurRect.Height = (int)(rect1.Height * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
+				AForge.Imaging.Filters.GaussianBlur gb = new AForge.Imaging.Filters.GaussianBlur(2, 30);
+				Bitmap bmp = BitmapFromSource(img.Source as BitmapSource);
+				gb.ApplyInPlace(bmp, blurRect);
+				img.Source = BitmapToImageSource(bmp);
+			}
+			
 			blurring = false;
 			btnBlur.IsEnabled = true;
 
@@ -683,6 +714,40 @@ namespace ClassifyPics
 			cropBR.Visibility = Visibility.Hidden;
 			cropTL.Visibility = Visibility.Hidden;
 			cropArea.Visibility = Visibility.Hidden;
+		}
+
+		public Bitmap BitmapFromSource(System.Windows.Media.Imaging.BitmapSource bitmapsource)
+		{
+			//convert image format
+			var src = new System.Windows.Media.Imaging.FormatConvertedBitmap();
+			src.BeginInit();
+			src.Source = bitmapsource;
+			src.DestinationFormat = System.Windows.Media.PixelFormats.Bgra32;
+			src.EndInit();
+
+			//copy to bitmap
+			Bitmap bitmap = new Bitmap(src.PixelWidth, src.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			var data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			src.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
+			bitmap.UnlockBits(data);
+
+			return bitmap;
+		}
+
+		BitmapImage BitmapToImageSource(Bitmap bitmap)
+		{
+			using (MemoryStream memory = new MemoryStream())
+			{
+				bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+				memory.Position = 0;
+				BitmapImage bitmapimage = new BitmapImage();
+				bitmapimage.BeginInit();
+				bitmapimage.StreamSource = memory;
+				bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+				bitmapimage.EndInit();
+
+				return bitmapimage;
+			}
 		}
 		#endregion
 	}
