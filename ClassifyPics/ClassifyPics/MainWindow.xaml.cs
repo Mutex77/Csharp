@@ -9,6 +9,9 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Runtime.InteropServices;
+using Microsoft.WindowsAPICodePack.Shell;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 namespace ClassifyPics
 {
@@ -58,7 +61,8 @@ namespace ClassifyPics
 			cropBR.TouchMove += new EventHandler<TouchEventArgs>(cropBR_TouchMove);
 			cropBR.TouchUp += new EventHandler<TouchEventArgs>(cropBR_TouchUp);
 
-
+			appWindow.ContentRendered += new EventHandler(ResizeEvent);
+			imgContainer.SizeChanged += new SizeChangedEventHandler(appWindow_SizeChanged);
 		}
 
 
@@ -69,12 +73,17 @@ namespace ClassifyPics
 		//##																							##
 		//################################################################################################
 		
+		private void ResizeEvent(object sender, EventArgs e)
+		{
+			CenterImage();
+		}
+
 		private void appWindow_Loaded(object sender, RoutedEventArgs e)
 		{
 			if (TESTING)
 			{
-				sourcePath = "C:\\Users\\Mutex\\Pictures";
-				destinationPath = "C:\\";
+				sourcePath = "C:\\Users\\Phoenix\\Pictures";
+				destinationPath = "C:\\Puppy";
 				sourceFolderOpened = true;
 				destinationFolderOpened = true;
 				GetFirstPicture();
@@ -83,9 +92,15 @@ namespace ClassifyPics
 
 		private void appWindow_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
+			CenterImage();
+		}
+
+		private void CenterImage()
+		{
 			double imgTop;
 
 			CropTerminate();
+			BlurTerminate();
 
 			if (img.Source != null)
 			{
@@ -374,37 +389,23 @@ namespace ClassifyPics
 			}
 		}
 
-		private void btnPuppy_Click(object sender, RoutedEventArgs e)
+		private void btnCategorize_Click(object sender, RoutedEventArgs e)
 		{
-			CategorizeImage("Puppy");
-		}
-
-		private void btnKitten_Click(object sender, RoutedEventArgs e)
-		{
-			CategorizeImage("Kitten");
-		}
-
-		private void btnDog_Click(object sender, RoutedEventArgs e)
-		{
-			CategorizeImage("Dog");
-		}
-
-		private void btnCat_Click(object sender, RoutedEventArgs e)
-		{
-			CategorizeImage("Cat");
+			CategorizeImage();
 		}
 
 		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
-			CategorizeImage("Trash");
+			//CategorizeImage("Trash");
 		}
 
-		private void CategorizeImage(string category)
+		private void CategorizeImage()
 		{
 			bool isUnique = false;
 			string unique = "";
+			List<String> tags = new List<string>();
 
-            if (cropping)
+			if (cropping)
 				CropConfirm();
 
 			if (blurring)
@@ -412,29 +413,50 @@ namespace ClassifyPics
 
 			if (Directory.Exists(destinationPath) && img.Source != null)
 			{
-				if (!Directory.Exists(destinationPath + "\\" + category))
+				if (!Directory.Exists(destinationPath))
 				{
-					Directory.CreateDirectory(destinationPath + "\\" + category);
+					Directory.CreateDirectory(destinationPath);
 				}
 
 				while(!isUnique)
 				{
 					unique = string.Format(@"{0}.txt", Guid.NewGuid());
-					if (!File.Exists(destinationPath + "\\" + category + "\\" + category + "_" + unique + ".jpg"))
+					if (!File.Exists(destinationPath + "\\" + unique + ".jpg"))
 						isUnique = true;
 				}
 				
-				FileStream fs = new FileStream(destinationPath + "\\" + category + "\\" + category + "_" + unique + ".jpg", FileMode.Create);
+				FileStream fs = new FileStream(destinationPath + "\\" + unique + ".jpg", FileMode.Create);
 				JpegBitmapEncoder encoder = new JpegBitmapEncoder();
 				encoder.Frames.Add(BitmapFrame.Create(img.Source as BitmapSource));
 				encoder.QualityLevel = 50;
 				encoder.Save(fs);
-
+				
 				fs.Flush();
 				fs.Dispose();
 				encoder = null;
 				img.Source = null;
 				//File.Delete((img.Source as BitmapImage).UriSource.LocalPath);
+
+				if (rbNormal.IsChecked == true)
+					tags.Add("Normal");
+				else if (rbMeme.IsChecked == true)
+					tags.Add("Meme");
+
+				if (cbPuppy.IsChecked == true)
+					tags.Add("Puppy");
+
+				if (cbDog.IsChecked == true)
+					tags.Add("Dog");
+
+				if (cbKitten.IsChecked == true)
+					tags.Add("Kitten");
+
+				if (cbCat.IsChecked == true)
+					tags.Add("Cat");
+
+				var pic = ShellFile.FromFilePath(destinationPath + "\\" + unique + ".jpg");
+				pic.Properties.System.Category.Value = tags.ToArray();
+				pic.Dispose();
 
 				GetPicture();
 			}
@@ -610,6 +632,9 @@ namespace ClassifyPics
 				crpRect.Height = (int)(rect1.Height * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
 				BitmapSource crpImg = new CroppedBitmap(img.Source as BitmapSource, crpRect);
 				img.Source = crpImg;
+
+				img.MaxHeight = crpImg.PixelHeight;
+				img.MaxWidth = crpImg.PixelWidth;
 			}
 
 			cropping = false;
@@ -621,8 +646,12 @@ namespace ClassifyPics
 			cropBR.Visibility = Visibility.Hidden;
 			cropTL.Visibility = Visibility.Hidden;
 			cropArea.Visibility = Visibility.Hidden;
-			
+
+			img.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+			CenterImage();
 		}
+
+		public static Action EmptyDelegate = delegate () { };
 
 		private void CropTerminate()
 		{
@@ -686,9 +715,9 @@ namespace ClassifyPics
 				blurRect.Y = (int)(rect1.Y * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
 				blurRect.Width = (int)(rect1.Width * ((img.Source as BitmapSource).PixelWidth / img.ActualWidth));
 				blurRect.Height = (int)(rect1.Height * ((img.Source as BitmapSource).PixelHeight / img.ActualHeight));
-				AForge.Imaging.Filters.GaussianBlur gb = new AForge.Imaging.Filters.GaussianBlur(2, 30);
+				AForge.Imaging.Filters.Pixellate px = new AForge.Imaging.Filters.Pixellate(50);
 				Bitmap bmp = BitmapFromSource(img.Source as BitmapSource);
-				gb.ApplyInPlace(bmp, blurRect);
+				px.ApplyInPlace(bmp, blurRect);
 				img.Source = BitmapToImageSource(bmp);
 			}
 			
@@ -716,18 +745,36 @@ namespace ClassifyPics
 			cropArea.Visibility = Visibility.Hidden;
 		}
 
+		//public Bitmap BitmapFromSource(System.Windows.Media.Imaging.BitmapSource bitmapsource)
+		//{
+		//	//convert image format
+		//	var src = new System.Windows.Media.Imaging.FormatConvertedBitmap();
+		//	src.BeginInit();
+		//	src.Source = bitmapsource;
+		//	src.DestinationFormat = System.Windows.Media.PixelFormats.Bgra32;
+		//	src.EndInit();
+
+		//	//copy to bitmap
+		//	Bitmap bitmap = new Bitmap(src.PixelWidth, src.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+		//	var data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+		//	src.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
+		//	bitmap.UnlockBits(data);
+
+		//	return bitmap;
+		//}
+
 		public Bitmap BitmapFromSource(System.Windows.Media.Imaging.BitmapSource bitmapsource)
 		{
 			//convert image format
 			var src = new System.Windows.Media.Imaging.FormatConvertedBitmap();
 			src.BeginInit();
 			src.Source = bitmapsource;
-			src.DestinationFormat = System.Windows.Media.PixelFormats.Bgra32;
+			src.DestinationFormat = System.Windows.Media.PixelFormats.Bgr24;
 			src.EndInit();
 
 			//copy to bitmap
-			Bitmap bitmap = new Bitmap(src.PixelWidth, src.PixelHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-			var data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			Bitmap bitmap = new Bitmap(src.PixelWidth, src.PixelHeight, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+			var data = bitmap.LockBits(new System.Drawing.Rectangle(System.Drawing.Point.Empty, bitmap.Size), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 			src.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
 			bitmap.UnlockBits(data);
 
@@ -748,6 +795,17 @@ namespace ClassifyPics
 
 				return bitmapimage;
 			}
+		}
+
+		public static Bitmap ConvertToBitmap(BitmapSource bitmapSource)
+		{
+			var width = bitmapSource.PixelWidth;
+			var height = bitmapSource.PixelHeight;
+			var stride = width * ((bitmapSource.Format.BitsPerPixel + 7) / 8);
+			var memoryBlockPointer = Marshal.AllocHGlobal(height * stride);
+			bitmapSource.CopyPixels(new Int32Rect(0, 0, width, height), memoryBlockPointer, height * stride, stride);
+			var bitmap = new Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format24bppRgb, memoryBlockPointer);
+			return bitmap;
 		}
 		#endregion
 	}
