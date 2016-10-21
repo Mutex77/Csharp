@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
+using MySql.Data.MySqlClient;
 
 namespace ClassifyPics
 {
@@ -82,7 +83,7 @@ namespace ClassifyPics
 		{
 			if (TESTING)
 			{
-				sourcePath = "C:\\Users\\Phoenix\\Pictures";
+				sourcePath = "C:\\Users\\Mutex\\Pictures";
 				destinationPath = "C:\\Puppy";
 				sourceFolderOpened = true;
 				destinationFolderOpened = true;
@@ -397,6 +398,7 @@ namespace ClassifyPics
 		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
 			//CategorizeImage("Trash");
+			test();
 		}
 
 		private void CategorizeImage()
@@ -404,6 +406,7 @@ namespace ClassifyPics
 			bool isUnique = false;
 			string unique = "";
 			List<String> tags = new List<string>();
+			string str = "";
 
 			if (cropping)
 				CropConfirm();
@@ -455,9 +458,19 @@ namespace ClassifyPics
 					tags.Add("Cat");
 
 				var pic = ShellFile.FromFilePath(destinationPath + "\\" + unique + ".jpg");
-				pic.Properties.System.Category.Value = tags.ToArray();
-				pic.Dispose();
+				
+				foreach (string s in tags)
+                {
+					str = str + s + ";";
+				}
+				System.Windows.Forms.MessageBox.Show(str);
+                pic.Properties.System.Subject.Value = str;
+				
+				str = new DirectoryInfo((new Uri(img.Source.ToString())).AbsolutePath).Parent.Name;
+				pic.Properties.System.Comment.Value = str;
 
+				pic.Dispose();
+				
 				GetPicture();
 			}
 		}
@@ -808,5 +821,30 @@ namespace ClassifyPics
 			return bitmap;
 		}
 		#endregion
+
+		public void test()
+		{
+			MySqlConnection cn = new MySqlConnection();
+			MySqlCommand cmd = new MySqlCommand();
+
+			cn.ConnectionString = "server=; userid=; password=; database=";
+			cn.Open();
+
+			cmd.Connection = cn;
+			cmd.CommandText = "INSERT INTO `mutex_PuppiesAgainstKittens`.`images` (`image_id`, `image_path`) VALUES (NULL, 'puppiesagainstkittens.com/poop/yay.jpg')";
+
+			try
+			{
+				cmd.ExecuteNonQuery();
+			} catch (MySqlException e)
+			{
+				System.Windows.MessageBox.Show("Error inserting row: \n" + e);
+			}
+
+			System.Windows.MessageBox.Show("Woot");
+
+			cmd.Dispose();
+			cn.Close();
+		}
 	}
 }
