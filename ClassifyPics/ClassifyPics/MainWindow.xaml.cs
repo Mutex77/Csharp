@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,9 @@ using System.Runtime.InteropServices;
 using Microsoft.WindowsAPICodePack.Shell;
 using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 using MySql.Data.MySqlClient;
+using System.Net;
+using System.Security;
+using System.Threading.Tasks;
 
 namespace ClassifyPics
 {
@@ -21,8 +25,9 @@ namespace ClassifyPics
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private const bool TESTING = true;
+		private const bool TESTING = false;
 		private string
+			username,
 			sourcePath, 
 			destinationPath;
 		private bool
@@ -36,12 +41,16 @@ namespace ClassifyPics
 			styCropBR = false,
 			cropping = false,
 			blurring = false;
-			
 		private List<string>
 			imgFiles;
 		private System.Windows.Point
 			ptTLLast,
 			ptBRLast;
+		private MySqlConnection
+			connection = new MySqlConnection();
+		private SecureString
+			password;
+		
 			
 
 		public MainWindow()
@@ -64,6 +73,8 @@ namespace ClassifyPics
 
 			appWindow.ContentRendered += new EventHandler(ResizeEvent);
 			imgContainer.SizeChanged += new SizeChangedEventHandler(appWindow_SizeChanged);
+
+			connection.StateChange += new System.Data.StateChangeEventHandler(connection_StateChange);
 		}
 
 
@@ -83,11 +94,22 @@ namespace ClassifyPics
 		{
 			if (TESTING)
 			{
-				sourcePath = "C:\\Users\\Mutex\\Pictures";
+				sourcePath = "C:\\Users\\Phoenix\\Pictures";
 				destinationPath = "C:\\Puppy";
 				sourceFolderOpened = true;
 				destinationFolderOpened = true;
 				GetFirstPicture();
+			}
+
+			ConnectToDatabase();
+		}
+
+		private void connection_StateChange(object sender, EventArgs e)
+		{
+			if (connection.State == System.Data.ConnectionState.Broken) // || connection.State == System.Data.ConnectionState.Closed)
+			{
+				System.Windows.MessageBox.Show("The database connection has been terminated, reconnect to continue.");
+				ConnectToDatabase();
 			}
 		}
 
@@ -398,15 +420,22 @@ namespace ClassifyPics
 		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
 			//CategorizeImage("Trash");
-			test();
+			//test();
 		}
 
 		private void CategorizeImage()
 		{
 			bool isUnique = false;
-			string unique = "";
+			string uniqueFileName = "";
 			List<String> tags = new List<string>();
 			string str = "";
+			string origPath = "";
+			int imgID, year, month;
+			TaskFactory tf = new TaskFactory();
+			
+
+			year = DateTime.Today.Year;
+			month = DateTime.Today.Month;
 
 			if (cropping)
 				CropConfirm();
@@ -416,19 +445,19 @@ namespace ClassifyPics
 
 			if (Directory.Exists(destinationPath) && img.Source != null)
 			{
-				if (!Directory.Exists(destinationPath))
-				{
-					Directory.CreateDirectory(destinationPath);
-				}
+				//if (!Directory.Exists(destinationPath))
+				//{
+				//	Directory.CreateDirectory(destinationPath);
+				//}
 
 				while(!isUnique)
 				{
-					unique = string.Format(@"{0}.txt", Guid.NewGuid());
-					if (!File.Exists(destinationPath + "\\" + unique + ".jpg"))
+					uniqueFileName = string.Format(@"{0}.jpg", Guid.NewGuid());
+					if (!File.Exists(destinationPath + "\\" + uniqueFileName))
 						isUnique = true;
 				}
 				
-				FileStream fs = new FileStream(destinationPath + "\\" + unique + ".jpg", FileMode.Create);
+				FileStream fs = new FileStream(destinationPath + "\\" + uniqueFileName, FileMode.Create);
 				JpegBitmapEncoder encoder = new JpegBitmapEncoder();
 				encoder.Frames.Add(BitmapFrame.Create(img.Source as BitmapSource));
 				encoder.QualityLevel = 50;
@@ -437,9 +466,7 @@ namespace ClassifyPics
 				fs.Flush();
 				fs.Dispose();
 				encoder = null;
-				img.Source = null;
-				//File.Delete((img.Source as BitmapImage).UriSource.LocalPath);
-
+				
 				if (rbNormal.IsChecked == true)
 					tags.Add("Normal");
 				else if (rbMeme.IsChecked == true)
@@ -457,20 +484,46 @@ namespace ClassifyPics
 				if (cbCat.IsChecked == true)
 					tags.Add("Cat");
 
-				var pic = ShellFile.FromFilePath(destinationPath + "\\" + unique + ".jpg");
-				
-				foreach (string s in tags)
-                {
-					str = str + s + ";";
+				using (WebClient client = new WebClient())
+				{
+					client.Credentials = new NetworkCredential(username + "@puppiesagainstkittens.com", password);
+
+					origPath = (img.Source as BitmapImage).UriSource.LocalPath;
+					
+					var tsk = tf.StartNew(() =>
+					{
+						client.UploadFile($"ftp://ftp.bonewald.com/{uniqueFileName}", "STOR", origPath);
+						File.Delete(origPath);
+					});
+					
 				}
-				System.Windows.Forms.MessageBox.Show(str);
-                pic.Properties.System.Subject.Value = str;
 				
-				str = new DirectoryInfo((new Uri(img.Source.ToString())).AbsolutePath).Parent.Name;
+				//insert to images
+				imgID = DBImagesInsert(uniqueFileName);
+
+				foreach (string s in tags)
+				{
+					str = str + s + ";";
+
+					//insert to image tags
+					DBImageTagsInsert(imgID, s);
+				}
+
+				var pic = ShellFile.FromFilePath(destinationPath + "\\" + uniqueFileName);
+				pic.Properties.System.Subject.Value = str;
+				
+				str = new DirectoryInfo((new Uri(origPath)).AbsolutePath).Parent.Name;
 				pic.Properties.System.Comment.Value = str;
 
 				pic.Dispose();
-				
+				img.Source = null;
+
+				rbNormal.IsChecked = true;
+				cbPuppy.IsChecked = false;
+				cbKitten.IsChecked = false;
+				cbDog.IsChecked = false;
+				cbCat.IsChecked = false;
+
 				GetPicture();
 			}
 		}
@@ -520,11 +573,16 @@ namespace ClassifyPics
 					}
 				}
 				
-				bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+				bitmap = new BitmapImage();
+				bitmap.BeginInit();
+				bitmap.CacheOption = BitmapCacheOption.OnLoad;
+				bitmap.UriSource = new Uri(imgFiles[imgFiles.Count - 1]);
+				bitmap.EndInit();
+
 				img.Source = bitmap;
 				img.MaxHeight = bitmap.PixelHeight;
 				img.MaxWidth = bitmap.PixelWidth;
-
+				
 				Dispatcher.Invoke(new Action(() =>
 				{
 					if (img.MaxHeight >= imgContainer.ActualHeight - 85)
@@ -568,7 +626,12 @@ namespace ClassifyPics
 			}
 			else
 			{
-				bitmap = new BitmapImage(new Uri(imgFiles[imgFiles.Count - 1]));
+				bitmap = new BitmapImage();
+				bitmap.BeginInit();
+				bitmap.CacheOption = BitmapCacheOption.OnLoad;
+				bitmap.UriSource = new Uri(imgFiles[imgFiles.Count - 1]);
+				bitmap.EndInit();
+
 				img.Source = bitmap;
 				img.MaxHeight = bitmap.PixelHeight;
 				img.MaxWidth = bitmap.PixelWidth;
@@ -821,28 +884,112 @@ namespace ClassifyPics
 			return bitmap;
 		}
 		#endregion
-
-		public void test()
+		
+		private void ConnectToDatabase(string user = "")
 		{
-			MySqlConnection cn = new MySqlConnection();
+			//MySqlCommand cmd = new MySqlCommand();
+			Login loginWindow = new Login();
+
+			if (connection == null)
+				connection = new MySqlConnection();
+
+			loginWindow.tbUsername.Text = user;
+			loginWindow.ShowDialog();
+
+			if (loginWindow.DialogResult.HasValue && loginWindow.DialogResult.Value)
+			{
+				username = loginWindow.tbUsername.Text;
+				password = loginWindow.pbPassword.SecurePassword;
+				loginWindow.Close();
+				
+				connection.ConnectionString = $"server=192.185.52.194; userid={username}; password={loginWindow.pbPassword.Password}; database=mutex_PuppiesAgainstKittens";
+
+				try
+				{
+					connection.Open();
+				}
+				catch (MySqlException e)
+				{
+					System.Windows.MessageBox.Show("Login username or password incorrect.");
+					password = new SecureString();
+					ConnectToDatabase(username);
+				}
+			}
+			else
+			{
+				this.Close();
+			}
+		}
+
+		public int DBImagesInsert(string fileName)
+		{
+			int imgID = 0;
 			MySqlCommand cmd = new MySqlCommand();
-
-			cn.ConnectionString = "server=; userid=; password=; database=";
-			cn.Open();
-
-			cmd.Connection = cn;
-			cmd.CommandText = "INSERT INTO `mutex_PuppiesAgainstKittens`.`images` (`image_id`, `image_path`) VALUES (NULL, 'puppiesagainstkittens.com/poop/yay.jpg')";
+			cmd.Connection = connection;
+			cmd.CommandText = $"INSERT INTO `mutex_PuppiesAgainstKittens`.`images` (`image_id`, `image_path`, `date`) VALUES (NULL, 'http://puppiesagainstkittens.com/imgs/{fileName}', {DateTime.Now.ToString("yyyyMMddHHmmss")});";
 
 			try
 			{
 				cmd.ExecuteNonQuery();
-			} catch (MySqlException e)
+				imgID = (int)cmd.LastInsertedId;
+			}
+			catch (MySqlException e)
 			{
 				System.Windows.MessageBox.Show("Error inserting row: \n" + e);
 			}
 
-			System.Windows.MessageBox.Show("Woot");
+			return imgID;
+		}
 
+		public void DBImageTagsInsert(int imgID, string tag)
+		{
+			MySqlCommand cmd = new MySqlCommand();
+			cmd.Connection = connection;
+			cmd.CommandText = $"INSERT INTO `mutex_PuppiesAgainstKittens`.`image_tags` (`image_id`, `tag`) VALUES ({imgID}, '{tag}');";
+
+			try
+			{
+				cmd.ExecuteNonQuery();
+			}
+			catch (MySqlException e)
+			{
+				System.Windows.MessageBox.Show("Error inserting row: \n" + e);
+			}
+		}
+
+		public void test()
+		{
+			string username, password;
+			MySqlConnection cn = new MySqlConnection();
+			MySqlCommand cmd = new MySqlCommand();
+			Login loginWindow = new Login();
+
+			loginWindow.ShowDialog();
+
+			if (loginWindow.DialogResult.HasValue && loginWindow.DialogResult.Value)
+			{
+				username = loginWindow.tbUsername.Text;
+				password = loginWindow.pbPassword.Password;
+
+				cn.ConnectionString = $"server=192.185.52.194; userid={username}; password={password}; database=mutex_PuppiesAgainstKittens";
+				cn.Open();
+
+				cmd.Connection = cn;
+				cmd.CommandText = $"INSERT INTO `mutex_PuppiesAgainstKittens`.`images` (`image_id`, `image_path`) VALUES (NULL, 'http://puppiesagainstkittens.com/imgs/')";
+
+				try
+				{
+					cmd.ExecuteNonQuery();
+				}
+				catch (MySqlException e)
+				{
+					System.Windows.MessageBox.Show("Error inserting row: \n" + e);
+				}
+
+				System.Windows.MessageBox.Show("Woot");
+			}
+
+			loginWindow.Close();
 			cmd.Dispose();
 			cn.Close();
 		}
