@@ -98,7 +98,7 @@
 		</StackPanel>
 		<Grid DockPanel.Dock="Bottom" HorizontalAlignment="Center" ShowGridLines="False">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="90px" />
+				<RowDefinition Height="120px" />
 				<RowDefinition Height="75px" />
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
@@ -110,25 +110,25 @@
 			<StackPanel Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
 				<GroupBox Header="Type" BorderThickness="0">
 					<StackPanel Name="imgType">
-						<RadioButton x:Name="rbNormal" Grid.Row="0" Grid.Column="1" Content="Normal" Focusable="False" FontSize="20" IsChecked="True"/>
-						<RadioButton x:Name="rbMeme" Grid.Row="0" Grid.Column="1" Content="Meme" Focusable="False" FontSize="20"/>
+						<RadioButton x:Name="rbNormal" Grid.Row="0" Grid.Column="1" Content="Normal" Focusable="False" FontSize="30" IsChecked="True"/>
+						<RadioButton x:Name="rbMeme" Grid.Row="0" Grid.Column="1" Content="Meme" Focusable="False" FontSize="30"/>
 					</StackPanel>
 				</GroupBox>
 				<GroupBox Header="Content" BorderBrush="Black" BorderThickness="0">
 					<Grid Name="imgContent">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="30px"/>
-							<RowDefinition Height="30px"/>
+							<RowDefinition Height="45px"/>
+							<RowDefinition Height="45px"/>
 						</Grid.RowDefinitions>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="100px"/>
-							<ColumnDefinition Width="100px"/>
+							<ColumnDefinition Width="120px"/>
+							<ColumnDefinition Width="120px"/>
 							<ColumnDefinition Width="*"/>
 						</Grid.ColumnDefinitions>
-						<CheckBox x:Name="cbPuppy" Grid.Row="0" Grid.Column="0" Content="Puppy" Focusable="False" FontSize="20" Margin="5px 0px 0px 0px"/>
-						<CheckBox x:Name="cbDog" Grid.Row="1" Grid.Column="0" Content="Dog" Focusable="False" FontSize="20" Margin="5px 0px 0px 0px"/>
-						<CheckBox x:Name="cbKitten" Grid.Row="0" Grid.Column="1" Content="Kitten" Focusable="False" FontSize="20" Margin="5px 0px 0px 0px"/>
-						<CheckBox x:Name="cbCat" Grid.Row="1" Grid.Column="1" Content="Cat" Focusable="False" FontSize="20" Margin="5px 0px 0px 0px"/>
+						<CheckBox x:Name="cbPuppy" Grid.Row="0" Grid.Column="0" Content="Puppy" Focusable="False" FontSize="30" Margin="5px 0px 0px 0px"/>
+						<CheckBox x:Name="cbDog" Grid.Row="1" Grid.Column="0" Content="Dog" Focusable="False" FontSize="30" Margin="5px 0px 0px 0px"/>
+						<CheckBox x:Name="cbKitten" Grid.Row="0" Grid.Column="1" Content="Kitten" Focusable="False" FontSize="30" Margin="5px 0px 0px 0px"/>
+						<CheckBox x:Name="cbCat" Grid.Row="1" Grid.Column="1" Content="Cat" Focusable="False" FontSize="30" Margin="5px 0px 0px 0px"/>
 					</Grid>
 				</GroupBox>
 			</StackPanel>
@@ -136,14 +136,18 @@
 			<Button x:Name="btnCategorize" Click="btnCategorize_Click" Grid.Row="1" Grid.Column="2" Margin="0px 10px 0px 5px" Content="Confirm Tags" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			
 			<StackPanel Grid.Row="0" Grid.Column="0">
-				<Button Name="btnCrop" Click="btnCrop_Click" Grid.Row="0" Grid.Column="0" Margin="5px 0px 5px 0px" Content="Crop" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
-				<Button Name="btnBlur" Click="btnBlur_Click" Grid.Row="1" Grid.Column="0" Margin="5px 0px 5px 0px" Content="Blur" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+				<Button Name="btnCrop" Click="btnCrop_Click" Grid.Row="0" Grid.Column="0" Height="55px" Margin="5px 0px 5px 0px" Content="Crop" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
+				<Button Name="btnBlur" Click="btnBlur_Click" Grid.Row="1" Grid.Column="0" Height="55px" Margin="5px 0px 5px 0px" Content="Blur" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 			</StackPanel>
 			<StackPanel Grid.Row="0" Grid.Column="3">
-				<Button Name="btnConfirm" Click="btnConfirm_Click" Grid.Row="0" Grid.Column="3" Margin="5px 0px 5px 0px" Content="Confirm" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
-				<Button Name="btnCancel" Click="btnCancel_Click" Grid.Row="1" Grid.Column="3" Margin="5px 0px 5px 0px" Content="Cancel" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
+				<Button Name="btnConfirm" Click="btnConfirm_Click" Grid.Row="0" Grid.Column="3" Height="55px" Margin="5px 0px 5px 0px" Content="Confirm" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
+				<Button Name="btnCancel" Click="btnCancel_Click" Grid.Row="1" Grid.Column="3" Height="55px" Margin="5px 0px 5px 0px" Content="Cancel" Focusable="False" Visibility="Hidden" Style="{DynamicResource ClassifyButtonStyle}" />
 			</StackPanel>
-			
+			<StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical">
+				<Label Name="lblWidth" Content="W:"/>
+				<Label Name="lblHeight" Content="H:"/>
+			</StackPanel>
+			<Button Name="btnCenterImage" Click="btnCenterImage_Click" Grid.Row="1" Grid.Column="3" Content="Center Img" Margin="5px 10px 5px 5px" Focusable="False" Style="{DynamicResource ClassifyButtonStyle}"/>
 		</Grid>
 		<Canvas x:Name="imgContainer">
 			<Image x:Name="img" Stretch="Uniform" Canvas.Top="0" Canvas.Left="0" />

@@ -27,6 +27,7 @@ namespace ClassifyPics
 	{
 		private const bool TESTING = false;
 		private string
+			origPath,
 			username,
 			sourcePath, 
 			destinationPath;
@@ -141,6 +142,9 @@ namespace ClassifyPics
 				Canvas.SetTop(img, imgTop);
 				Canvas.SetLeft(img, (imgContainer.ActualWidth - img.ActualWidth) / 2);
 			}
+
+			lblWidth.Content = "W: " + img.MaxWidth;
+			lblHeight.Content = "H: " + img.MaxHeight;
 		}
 		#endregion
 
@@ -419,8 +423,14 @@ namespace ClassifyPics
 
 		private void btnTrash_Click(object sender, RoutedEventArgs e)
 		{
-			//CategorizeImage("Trash");
-			//test();
+			File.Delete(origPath);
+			img.Source = null;
+			GetPicture();
+		}
+
+		private void btnCenterImage_Click(object sender, RoutedEventArgs e)
+		{
+			CenterImage();
 		}
 
 		private void CategorizeImage()
@@ -429,7 +439,6 @@ namespace ClassifyPics
 			string uniqueFileName = "";
 			List<String> tags = new List<string>();
 			string str = "";
-			string origPath = "";
 			int imgID, year, month;
 			TaskFactory tf = new TaskFactory();
 			
@@ -487,8 +496,6 @@ namespace ClassifyPics
 				using (WebClient client = new WebClient())
 				{
 					client.Credentials = new NetworkCredential(username + "@puppiesagainstkittens.com", password);
-
-					origPath = (img.Source as BitmapImage).UriSource.LocalPath;
 					
 					var tsk = tf.StartNew(() =>
 					{
@@ -517,13 +524,7 @@ namespace ClassifyPics
 
 				pic.Dispose();
 				img.Source = null;
-
-				rbNormal.IsChecked = true;
-				cbPuppy.IsChecked = false;
-				cbKitten.IsChecked = false;
-				cbDog.IsChecked = false;
-				cbCat.IsChecked = false;
-
+				
 				GetPicture();
 			}
 		}
@@ -560,6 +561,12 @@ namespace ClassifyPics
 			double imgTop;
 			BitmapImage bitmap;
 
+			rbNormal.IsChecked = true;
+			cbPuppy.IsChecked = false;
+			cbKitten.IsChecked = false;
+			cbDog.IsChecked = false;
+			cbCat.IsChecked = false;
+
 			if (sourceFolderOpened && destinationFolderOpened && Directory.Exists(sourcePath) && Directory.Exists(destinationPath))
 			{
 				var extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif" };
@@ -580,6 +587,7 @@ namespace ClassifyPics
 				bitmap.EndInit();
 
 				img.Source = bitmap;
+				origPath = bitmap.UriSource.LocalPath;
 				img.MaxHeight = bitmap.PixelHeight;
 				img.MaxWidth = bitmap.PixelWidth;
 				
@@ -601,6 +609,8 @@ namespace ClassifyPics
 				}), DispatcherPriority.ContextIdle);
 
 				imgFiles.RemoveAt(imgFiles.Count - 1);
+
+				
 			}
 		}
 
@@ -609,7 +619,13 @@ namespace ClassifyPics
 			double imgTop;
 			BitmapImage bitmap;
 
-			if(cropping)
+			rbNormal.IsChecked = true;
+			cbPuppy.IsChecked = false;
+			cbKitten.IsChecked = false;
+			cbDog.IsChecked = false;
+			cbCat.IsChecked = false;
+
+			if (cropping)
 				CropTerminate();
 			
 			if(!sourceFolderOpened)
@@ -633,6 +649,7 @@ namespace ClassifyPics
 				bitmap.EndInit();
 
 				img.Source = bitmap;
+				origPath = bitmap.UriSource.LocalPath;
 				img.MaxHeight = bitmap.PixelHeight;
 				img.MaxWidth = bitmap.PixelWidth;
 
